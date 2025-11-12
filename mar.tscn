@@ -1,0 +1,26 @@
+[gd_scene load_steps=3 format=3 uid="uid://8yyymnaa825s"]
+
+[ext_resource type="Script" uid="uid://dkov1mfea7lvt" path="res://tablero.gd" id="1_v2eyb"]
+[ext_resource type="Texture2D" uid="uid://dg3ai7k07sn2c" path="res://Mar.jpeg" id="2_t6s8x"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="GridContainer2" type="GridContainer" parent="."]
+z_index = 4
+clip_contents = true
+custom_minimum_size = Vector2(500, 500)
+layout_direction = 1
+anchors_preset = -1
+scale = Vector2(0.405, 0.395)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 10
+script = ExtResource("1_v2eyb")
+metadata/_edit_use_anchors_ = true
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(999.99994, 544)
+scale = Vector2(4.0507813, 2.5058594)
+texture = ExtResource("2_t6s8x")

@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://7e7w5bm4unen"]
+
+[ext_resource type="Script" uid="uid://cycgd1od27mbe" path="res://barco.gd" id="1_6mogq"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_h261h"]
+
+[node name="Area2D" type="Area2D"]
+script = ExtResource("1_6mogq")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(8, 8)
+shape = SubResource("RectangleShape2D_h261h")
