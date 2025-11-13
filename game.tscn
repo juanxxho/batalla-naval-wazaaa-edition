@@ -4,3 +4,38 @@
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource("1_80nbo")
+
+[node name="PanelSelector" type="Control" parent="."]
+z_index = 10
+layout_mode = 3
+anchors_preset = 0
+
+[node name="VBoxBarcos" type="VBoxContainer" parent="PanelSelector"]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 56.0
+
+[node name="BotonPortaaviones" type="Button" parent="PanelSelector/VBoxBarcos"]
+layout_mode = 2
+tooltip_text = "Portaaviones 5"
+
+[node name="BotonAcorazado" type="Button" parent="PanelSelector/VBoxBarcos"]
+layout_mode = 2
+tooltip_text = "Acorazado 4"
+
+[node name="BotonSubmarino" type="Button" parent="PanelSelector/VBoxBarcos"]
+layout_mode = 2
+tooltip_text = "Submarino 3"
+
+[node name="BotonDestructor" type="Button" parent="PanelSelector/VBoxBarcos"]
+layout_mode = 2
+tooltip_text = "Destructor 3"
+
+[node name="BotonPatrulla" type="Button" parent="PanelSelector/VBoxBarcos"]
+layout_mode = 2
+tooltip_text = "Patrulla 2"
+
+[node name="BotonRotar" type="Button" parent="PanelSelector"]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0

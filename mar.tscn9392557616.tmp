@@ -7,6 +7,8 @@
 
 [node name="GridContainer2" type="GridContainer" parent="."]
 z_index = 4
+clip_contents = true
+custom_minimum_size = Vector2(500, 500)
 layout_direction = 1
 scale = Vector2(0.405, 0.395)
 size_flags_horizontal = 3
@@ -18,4 +20,6 @@ script = ExtResource("1_v2eyb")
 metadata/_edit_use_anchors_ = true
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(999.99994, 544)
+scale = Vector2(4.0507813, 2.5058594)
 texture = ExtResource("2_t6s8x")

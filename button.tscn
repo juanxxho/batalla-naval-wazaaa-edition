@@ -4,13 +4,7 @@
 [ext_resource type="Script" uid="uid://cm7eaycfkut3y" path="res://celda.gd" id="1_r04n3"]
 
 [node name="TextureButton" type="TextureButton"]
-custom_minimum_size = Vector2(50, 50)
-anchors_preset = -1
-anchor_right = 0.080000006
-anchor_bottom = 0.142
-offset_right = -1.5258789e-05
-offset_bottom = 0.19999695
-scale = Vector2(0.495, 0.495)
+offset_right = 128.0
+offset_bottom = 128.0
 texture_normal = ExtResource("1_n4tde")
-stretch_mode = 0
 script = ExtResource("1_r04n3")
