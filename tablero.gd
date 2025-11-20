@@ -16,7 +16,6 @@ var estado_tablero: Array = []
 var celdas: Array = []
 
 func _ready():
-	# Inicializar la matriz a vacío (-1)
 	inicializar_matriz()
 	crear_celdas_visuales()
 	print("Tablero 10x10 generado.")
@@ -35,21 +34,14 @@ func crear_celdas_visuales():
 			var celda = CELDA_SCENE.instantiate()
 			add_child(celda)
 			
-			# 1. Almacenar la referencia en la lista
 			celdas.append(celda)
 			
-			# Asignamos la coordenada (x, y)
 			celda.coordenada = Vector2(x, y)
-			
-			# Ajustamos el tamaño (si es necesario)
 			celda.custom_minimum_size = Vector2(50, 50)
 			
-			# Conectamos la señal de clic de la CELDA a esta función
 			celda.celda_seleccionada.connect(_on_celda_seleccionada)
 
-# Esta función se llama cuando se hace clic en CUALQUIERA de las 100 celdas
 func _on_celda_seleccionada(coord: Vector2):
-	# Esta señal es capturada por Game.gd para decidir si es colocación o ataque.
 	emit_signal("celda_cliqueada", coord)
 	print("Celda cliqueada, señal emitida a Game Manager: ", coord)
 
@@ -59,23 +51,22 @@ func _on_celda_seleccionada(coord: Vector2):
 
 func actualizar_celda_visual(x: int, y: int, estado: int):
 	# La matriz 'celdas' se llenó por fila (Y) y luego por columna (X)
-	# (0,0), (1,0), ..., (9,0), (0,1), (1,1), ...
 	var index = y * TAMANO_TABLERO + x
 	
 	if index >= 0 and index < celdas.size():
 		var celda_node = celdas[index]
 		
 		# Asumiendo que el nodo de celda (button.tscn) tiene un ColorRect llamado 'ColorRect'
-		var color_rect = celda_node.get_node("ColorRect") 
-		
-		# Hacemos el ColorRect visible para mostrar el resultado
-		color_rect.visible = true
-		
-		match estado:
-			2: # Impacto (Hit)
-				color_rect.color = Color.RED
-			-2: # Agua (Miss)
-				color_rect.color = Color.BLUE
-			# Otros estados (0, 1, -1) no se modifican visualmente si no es un disparo
-	else:
-		print("ERROR: Índice de celda fuera de rango para la actualización visual.")
+		# o un nodo que puede cambiar de color.
+		if celda_node.has_node("ColorRect"):
+			var color_rect = celda_node.get_node("ColorRect") 
+			color_rect.visible = true
+			
+			match estado:
+				2: # Impacto (Hit)
+					color_rect.color = Color.RED
+				-2: # Agua (Miss)
+					color_rect.color = Color.BLUE
+		else:
+			# Si no tienes ColorRect, puedes intentar cambiar el color del módulo o de otro nodo.
+			pass # Si button.tscn no tiene ColorRect, ignora o adapta.

@@ -37,5 +37,39 @@ tooltip_text = "Patrulla 2"
 
 [node name="BotonRotar" type="Button" parent="PanelSelector"]
 layout_mode = 0
-offset_right = 8.0
+offset_left = 24.0
+offset_right = 32.0
 offset_bottom = 8.0
+
+[node name="ResultadoLabel" type="RichTextLabel" parent="."]
+z_index = 15
+offset_right = 1920.0
+offset_bottom = 1080.0
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/normal_font_size = 180
+theme_override_font_sizes/bold_font_size = 180
+theme_override_font_sizes/bold_italics_font_size = 180
+theme_override_font_sizes/italics_font_size = 180
+theme_override_font_sizes/mono_font_size = 180
+
+[node name="MonedasLabel" type="Label" parent="."]
+z_index = 17
+offset_left = 1360.0
+offset_top = 712.0
+offset_right = 1912.0
+offset_bottom = 1080.0
+
+[node name="DisparosPanel" type="VBoxContainer" parent="."]
+z_index = 16
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 200.0
+offset_top = 872.0
+offset_right = 464.0
+offset_bottom = 924.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BotonUlti" type="Button" parent="DisparosPanel"]
+layout_mode = 2
