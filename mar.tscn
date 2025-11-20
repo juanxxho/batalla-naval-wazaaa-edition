@@ -1,17 +1,18 @@
 [gd_scene load_steps=3 format=3 uid="uid://8yyymnaa825s"]
 
 [ext_resource type="Script" uid="uid://dkov1mfea7lvt" path="res://tablero.gd" id="1_v2eyb"]
-[ext_resource type="Texture2D" uid="uid://dg3ai7k07sn2c" path="res://Mar.jpeg" id="2_t6s8x"]
+[ext_resource type="Texture2D" uid="uid://c35sj1feqas11" path="res://mar.png" id="3_t6s8x"]
 
 [node name="Node2D" type="Node2D"]
 
 [node name="GridContainer2" type="GridContainer" parent="."]
+z_index = 1
 columns = 10
 script = ExtResource("1_v2eyb")
 metadata/_edit_use_anchors_ = true
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(-936, -399.99997)
-scale = Vector2(8.625, 4.375)
-texture = ExtResource("2_t6s8x")
+position = Vector2(-1539, -201.99997)
+scale = Vector2(2.385185, 1.148148)
+texture = ExtResource("3_t6s8x")
 centered = false

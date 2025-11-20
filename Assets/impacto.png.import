@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dcixgj7qk1uu0"
-path="res://.godot/imported/images-removebg-preview.png-1f8275e17ab6e042af4fa0ffd67a202b.ctex"
+uid="uid://basy447ci2ngu"
+path="res://.godot/imported/impacto.png-ce3717bb8abdc91e0a6565de73d4a705.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://images-removebg-preview.png"
-dest_files=["res://.godot/imported/images-removebg-preview.png-1f8275e17ab6e042af4fa0ffd67a202b.ctex"]
+source_file="res://Assets/impacto.png"
+dest_files=["res://.godot/imported/impacto.png-ce3717bb8abdc91e0a6565de73d4a705.ctex"]
 
 [params]
 

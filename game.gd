@@ -106,7 +106,7 @@ func _ready():
 	tablero_objetivo = TABLERO_SCENE.instantiate()
 	add_child(tablero_objetivo)
 	tablero_objetivo.name = "TableroObjetivo"
-	tablero_objetivo.position = Vector2(650, 100)
+	tablero_objetivo.position = Vector2(1200, 100)
 	tablero_objetivo.get_node("GridContainer2").mostrar_barcos = false
 	tablero_objetivo.get_node("GridContainer2").celda_cliqueada.connect(_on_tablero_objetivo_clic)
 	
