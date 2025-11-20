@@ -84,7 +84,7 @@ var barcos_restantes: Array = [
 @onready var boton_patrulla: Button = $PanelSelector/VBoxBarcos/BotonPatrulla
 # ========================================================
 @onready var resultado_label: RichTextLabel = $ResultadoLabel
-@onready var label_monedas: Label = $CanvasLayer/MonedasLabel
+@onready var label_monedas: Label = $MonedasLabel
 # === REFERENCIAS DE DISPAROS ESPECIALES ===
 @onready var disparos_panel: Control = $DisparosPanel # Agregado: Referencia al panel completo
 @onready var boton_mortero: Button = $DisparosPanel/BotonMortero
@@ -429,9 +429,11 @@ func actualizar_barco_fantasma_posicion(mouse_position: Vector2):
 	
 	var celda_pos = Vector2(grid_x * CELL_SIZE, grid_y * CELL_SIZE)
 	
+	# === CORRECCIÓN DEL DESFASE VERTICAL (CLAVE 1) ===
 	if not es_horizontal:
-		# Aplicar compensación visual para el pivot rotado
-		celda_pos -= Vector2(0, CELL_SIZE)
+		# Aplica el desfase visual para el pivot rotado
+		celda_pos -= Vector2(0, CELL_SIZE) 
+	# =================================================
 	
 	barco_fantasma.position = celda_pos
 
@@ -501,8 +503,11 @@ func _on_tablero_propio_clic(_coord: Vector2):
 		var grid_x = floor(x_fantasma_visual / CELL_SIZE)
 		var grid_y = floor(y_fantasma_visual / CELL_SIZE)
 		
-		if not es_horizontal:
-			grid_y += 1 # Compensación INVERSA (ya que en posicionamiento se restó 1 celda)
+		# === CORRECCIÓN DEL DESFASE VERTICAL (CLAVE 2) ===
+		# NO aplicamos compensación inversa (grid_y += 1).
+		# El grid_y obtenido es la coordenada superior de la celda donde inicia el barco, que es la correcta.
+		# if not es_horizontal: grid_y += 1 <--- ¡ELIMINADA!
+		# =================================================
 
 		var coord_final_colocacion = Vector2(grid_x, grid_y)
 		
@@ -579,14 +584,13 @@ func colocar_barco(coord: Vector2, longitud: int, horizontal: bool):
 	barco_instancia.position = celda_pos
 	
 	barco_instancia.z_index = 10
-	# CORRECCIÓN CLAVE: Asignar propiedades y meta para _es_barco_hundido
 	barco_instancia.longitud_casillas = longitud
-	# CORRECCIÓN CLAVE: Añadir meta-propiedad
 	barco_instancia.set_meta("longitud_casillas", longitud)
 	
 	if not horizontal:
 		barco_instancia.rotation_degrees = 90
-		# Compensación visual del barco colocado
+		# === CORRECCIÓN DEL DESFASE VERTICAL (CLAVE 3) ===
+		# Compensación visual del barco colocado para que coincida con el fantasma
 		barco_instancia.position -= Vector2(0, CELL_SIZE)
 	else:
 		barco_instancia.rotation_degrees = 0
