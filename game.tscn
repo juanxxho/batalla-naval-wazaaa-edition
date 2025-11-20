@@ -37,9 +37,9 @@ tooltip_text = "Patrulla 2"
 
 [node name="BotonRotar" type="Button" parent="PanelSelector"]
 layout_mode = 0
-offset_left = 24.0
-offset_right = 32.0
-offset_bottom = 8.0
+offset_left = 348.0
+offset_right = 373.0
+offset_bottom = 25.0
 
 [node name="ResultadoLabel" type="RichTextLabel" parent="."]
 z_index = 15
@@ -61,7 +61,7 @@ offset_bottom = 1080.0
 
 [node name="DisparosPanel" type="VBoxContainer" parent="."]
 z_index = 16
-anchors_preset = -1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 200.0
@@ -72,4 +72,16 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="BotonUlti" type="Button" parent="DisparosPanel"]
+layout_mode = 2
+
+[node name="BotonMortero" type="Button" parent="DisparosPanel"]
+layout_mode = 2
+
+[node name="BotonCohete" type="Button" parent="DisparosPanel"]
+layout_mode = 2
+
+[node name="BotonSonar" type="Button" parent="DisparosPanel"]
+layout_mode = 2
+
+[node name="BotonArea" type="Button" parent="DisparosPanel"]
 layout_mode = 2

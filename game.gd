@@ -1,4 +1,3 @@
-# Game.gd
 extends Node2D
 
 const TABLERO_SCENE = preload("res://mar.tscn")
@@ -77,19 +76,22 @@ var barcos_restantes: Array = [
 # @onready variables de Interfaz
 @onready var panel_selector: Control = $PanelSelector
 @onready var boton_rotar: Button = $PanelSelector/BotonRotar
+# === BOTONES DE COLOCACIÓN (Añadido: Asignación visual) ===
 @onready var boton_portaaviones: Button = $PanelSelector/VBoxBarcos/BotonPortaaviones
 @onready var boton_acorazado: Button = $PanelSelector/VBoxBarcos/BotonAcorazado
 @onready var boton_submarino: Button = $PanelSelector/VBoxBarcos/BotonSubmarino
 @onready var boton_destructor: Button = $PanelSelector/VBoxBarcos/BotonDestructor
 @onready var boton_patrulla: Button = $PanelSelector/VBoxBarcos/BotonPatrulla
+# ========================================================
 @onready var resultado_label: RichTextLabel = $ResultadoLabel
-@onready var label_monedas: Label = $CanvasLayer/MonedasLabel 
-
+@onready var label_monedas: Label = $CanvasLayer/MonedasLabel
 # === REFERENCIAS DE DISPAROS ESPECIALES ===
-@onready var boton_mortero: Button = $DisparosPanel/BotonMortero 
+@onready var disparos_panel: Control = $DisparosPanel # Agregado: Referencia al panel completo
+@onready var boton_mortero: Button = $DisparosPanel/BotonMortero
 @onready var boton_cohete: Button = $DisparosPanel/BotonCohete
 @onready var boton_sonar: Button = $DisparosPanel/BotonSonar
 @onready var boton_area: Button = $DisparosPanel/BotonArea
+@onready var boton_ulti: Button = $DisparosPanel/BotonUlti # Asumiendo que el nombre es BotonUlti
 # ==========================================
 
 
@@ -100,7 +102,7 @@ func _ready():
 	tablero_propio.position = Vector2(50, 100)
 	tablero_propio.get_node("GridContainer2").mostrar_barcos = true
 	tablero_propio.get_node("GridContainer2").celda_cliqueada.connect(_on_tablero_propio_clic)
-	actualizar_interfaz_monedas() # <--- Debe estar aquí
+	
 	tablero_objetivo = TABLERO_SCENE.instantiate()
 	add_child(tablero_objetivo)
 	tablero_objetivo.name = "TableroObjetivo"
@@ -111,15 +113,21 @@ func _ready():
 	panel_selector.position = Vector2(50, 650)
 	panel_selector.z_index = 10
 	panel_selector.visible = true
-	conectar_botones()
 	
-	actualizar_interfaz_monedas()
+	# --- VISUALIZACIÓN INICIAL ---
+	disparos_panel.visible = false # Ocultamos el panel de disparos hasta la batalla
+	resultado_label.visible = false # Ocultamos el label de resultado
+	actualizar_textos_botones_barco()
+	actualizar_textos_botones_disparo()
+	conectar_botones()
+	actualizar_interfaz_monedas() # Se llama al final para asegurar que label_monedas exista
+	# -----------------------------
 	
 	# --- INICIALIZACIÓN DE FANTASMA Y SELECCIÓN ---
 	if not barcos_restantes.is_empty():
 		barco_seleccionado_longitud = barcos_restantes[0].longitud
 	
-	crear_barco_fantasma() 
+	crear_barco_fantasma()
 	# ----------------------------------------------
 	
 	set_process_input(true)
@@ -133,18 +141,47 @@ func actualizar_interfaz_monedas():
 	if label_monedas:
 		label_monedas.text = "MONEDAS: " + str(monedas_jugador)
 		
+# --- NUEVA FUNCIÓN: Actualizar textos de botones de barco ---
+func actualizar_textos_botones_barco():
+	boton_portaaviones.text = "Portaaviones (5)"
+	boton_acorazado.text = "Acorazado (4)"
+	boton_submarino.text = "Submarino (3)"
+	boton_destructor.text = "Destructor (3)"
+	boton_patrulla.text = "Patrulla (2)"
+	
+# --- NUEVA FUNCIÓN: Actualizar textos de botones de disparo ---
+func actualizar_textos_botones_disparo():
+	var mortero_text = "Mortero"
+	var cohete_text = "Cohete (%d M)" % COSTO_COHETE
+	var sonar_text = "Sonar (%d M)" % COSTO_SONAR
+	var area_text = "Área (%d M)" % COSTO_AREA
+	var ulti_text = "ULTI"
+
+	if tipo_disparo_actual == "Mortero": mortero_text = "🎯 " + mortero_text
+	if tipo_disparo_actual == "Cohete": cohete_text = "🎯 " + cohete_text
+	if tipo_disparo_actual == "Sonar": sonar_text = "🎯 " + sonar_text
+	if tipo_disparo_actual == "Area": area_text = "🎯 " + area_text
+	if tipo_disparo_actual == "Ulti": ulti_text = "🎯 " + ulti_text
+	
+	if boton_mortero: boton_mortero.text = mortero_text
+	if boton_cohete: boton_cohete.text = cohete_text
+	if boton_sonar: boton_sonar.text = sonar_text
+	if boton_area: boton_area.text = area_text
+	if boton_ulti: boton_ulti.text = ulti_text # Asumiendo que esta referencia es correcta
+		
 func _desactivar_boton_barco(nombre_barco: String):
 	var boton: Button = null
+	var longitud: int = 0
 	match nombre_barco:
-		"Portaaviones": boton = boton_portaaviones
-		"Acorazado": boton = boton_acorazado
-		"Submarino": boton = boton_submarino
-		"Destructor": boton = boton_destructor
-		"Patrulla": boton = boton_patrulla
+		"Portaaviones": boton = boton_portaaviones; longitud = 5
+		"Acorazado": boton = boton_acorazado; longitud = 4
+		"Submarino": boton = boton_submarino; longitud = 3
+		"Destructor": boton = boton_destructor; longitud = 3
+		"Patrulla": boton = boton_patrulla; longitud = 2
 	
 	if boton:
 		boton.disabled = true
-		boton.text = nombre_barco + " (Colocado)"
+		boton.text = nombre_barco + " (%d) (Colocado)" % longitud
 
 func _input(event):
 	if fase_actual == Fase.COLOCACION and barco_seleccionado_longitud > 0:
@@ -154,7 +191,7 @@ func _input(event):
 			
 			actualizar_barco_fantasma_posicion(tablero_propio.get_global_mouse_position())
 			
-		if event.is_action_pressed("mouse_right") or event.is_action_pressed("rotar"): 
+		if event.is_action_pressed("mouse_right") or event.is_action_pressed("rotar"):
 			_on_boton_rotar_presionado()
 
 func cargar_ulti(cantidad: float):
@@ -170,6 +207,7 @@ func cargar_ulti(cantidad: float):
 		# Aquí se actualizaría la barra visual
 
 	print("Ulti cargada: %s%%" % ulti_cargada)
+	# Si tienes una barra de ulti, actualiza aquí.
 
 func conectar_botones():
 	# Botones de colocación de barcos
@@ -191,8 +229,8 @@ func conectar_botones():
 		boton_sonar.pressed.connect(_on_boton_disparo_seleccionado.bind("Sonar", COSTO_SONAR))
 	if boton_area:
 		boton_area.pressed.connect(_on_boton_disparo_seleccionado.bind("Area", COSTO_AREA))
-	if has_node("DisparosPanel/BotonUlti"): 
-		get_node("DisparosPanel/BotonUlti").pressed.connect(_on_boton_disparo_seleccionado.bind("Ulti", 0))
+	if boton_ulti:
+		boton_ulti.pressed.connect(_on_boton_disparo_seleccionado.bind("Ulti", 0))
 
 
 # =========================================================
@@ -206,6 +244,7 @@ func _colocar_barcos_ia():
 	
 	# Transición a fase de batalla
 	fase_actual = Fase.BATALLA
+	disparos_panel.visible = true # Hacemos visible el panel de disparos
 	print("TODOS los barcos de la IA colocados.")
 	print("FASE DE BATALLA INICIADA. ¡Dispara al tablero enemigo!")
 
@@ -221,7 +260,7 @@ func ejecutar_disparo_jugador(coord: Vector2, es_impacto: bool):
 	# Si la fase_actual es FIN_JUEGO, no hacemos nada y el juego se detiene.
 
 func seleccionar_siguiente_barco():
-	# Esta función ya no es estrictamente necesaria porque la colocación es por lista, 
+	# Esta función ya no es estrictamente necesaria porque la colocación es por lista, 
 	# pero la dejamos por si acaso
 	var barco_encontrado: bool = false
 	
@@ -319,9 +358,9 @@ func _colocar_barco_ia(coord: Vector2, longitud: int, horizontal: bool, matriz: 
 		
 	barco_instancia.z_index = 10
 	# CORRECCIÓN CLAVE: Asignar propiedades y meta para _es_barco_hundido
-	barco_instancia.longitud_casillas = longitud 
+	barco_instancia.longitud_casillas = longitud
 	# CORRECCIÓN CLAVE: Añadir meta-propiedad
-	barco_instancia.set_meta("longitud_casillas", longitud) 
+	barco_instancia.set_meta("longitud_casillas", longitud)
 	barco_instancia.rotation_degrees = 90 if not horizontal else 0
 	
 	for i in range(longitud):
@@ -392,7 +431,7 @@ func actualizar_barco_fantasma_posicion(mouse_position: Vector2):
 	
 	if not es_horizontal:
 		# Aplicar compensación visual para el pivot rotado
-		celda_pos -= Vector2(0, CELL_SIZE) 
+		celda_pos -= Vector2(0, CELL_SIZE)
 	
 	barco_fantasma.position = celda_pos
 
@@ -408,6 +447,7 @@ func _on_boton_barco_presionado(longitud: int, nombre: String):
 		barco_seleccionado_longitud = longitud
 		print("Barco ", nombre, " (", longitud, " casillas) seleccionado.")
 		crear_barco_fantasma()
+		actualizar_textos_botones_barco() # Opcional: Para resetear colores de selección si los tuvieras
 	else:
 		barco_seleccionado_longitud = 0
 		print("¡Barcos de tipo ", nombre, " agotados!")
@@ -439,14 +479,14 @@ func _on_boton_disparo_seleccionado(nombre_disparo: String, costo: int):
 	if nombre_disparo == "Ulti" and not ulti_disponible:
 		print("La habilidad Ulti no está cargada.")
 		tipo_disparo_actual = "Mortero"
-		return
-		
-	if costo > 0 and monedas_jugador < costo:
+	elif costo > 0 and monedas_jugador < costo:
 		print("Monedas insuficientes para usar " + nombre_disparo + ".")
 		tipo_disparo_actual = "Mortero"
 	else:
 		tipo_disparo_actual = nombre_disparo
 		print("Disparo seleccionado: " + tipo_disparo_actual)
+		
+	actualizar_textos_botones_disparo() # LLAMADA CLAVE: Actualiza el texto con el "🎯"
 		
 # =========================================================
 # Lógica de Colocación y Validación
@@ -469,7 +509,15 @@ func _on_tablero_propio_clic(_coord: Vector2):
 		var longitud = barco_seleccionado_longitud
 		
 		if validar_colocacion(coord_final_colocacion, longitud, es_horizontal):
+			# Encontrar el nombre del barco colocado
+			var nombre_barco_colocado = ""
+			for barco_data in barcos_restantes:
+				if barco_data.longitud == longitud:
+					nombre_barco_colocado = barco_data.nombre
+					break
+					
 			colocar_barco(coord_final_colocacion, longitud, es_horizontal)
+			_desactivar_boton_barco(nombre_barco_colocado) # Desactiva el botón
 			
 			barcos_restantes.pop_front()
 			
@@ -534,7 +582,7 @@ func colocar_barco(coord: Vector2, longitud: int, horizontal: bool):
 	# CORRECCIÓN CLAVE: Asignar propiedades y meta para _es_barco_hundido
 	barco_instancia.longitud_casillas = longitud
 	# CORRECCIÓN CLAVE: Añadir meta-propiedad
-	barco_instancia.set_meta("longitud_casillas", longitud) 
+	barco_instancia.set_meta("longitud_casillas", longitud)
 	
 	if not horizontal:
 		barco_instancia.rotation_degrees = 90
@@ -588,7 +636,7 @@ func _ejecutar_impacto_en_celda(x: int, y: int, tablero: Node2D) -> bool:
 				barcos_ia_hundidos += 1
 				check_win_condition()
 				
-			actualizar_interfaz_monedas()
+			actualizar_interfaz_monedas() # CLAVE: Actualiza monedas después de ganar
 
 		elif matriz[x][y] == -1:
 			matriz[x][y] = -2
@@ -608,13 +656,13 @@ func _ejecutar_impacto_en_celda(x: int, y: int, tablero: Node2D) -> bool:
 		elif matriz[x][y] == -1:
 			matriz[x][y] = -2
 
+	# CLAVE: Asegura que la celda se actualice VISUALMENTE
 	tablero.get_node("GridContainer2").actualizar_celda_visual(x, y, matriz[x][y])
 	
 	return es_impacto
 
 # =========================================================
 # LÓGICA DE DISPAROS ESPECÍFICOS (RF3, RF4, RF5, RF6, RF7)
-# (Estas funciones son correctas)
 # =========================================================
 
 func _ejecutar_disparo_mortero(coord: Vector2) -> bool:
@@ -649,6 +697,7 @@ func _ejecutar_disparo_sonar(coord: Vector2) -> bool:
 			if target_x >= 0 and target_x <= 9 and target_y >= 0 and target_y <= 9:
 				var estado_actual = matriz[target_x][target_y]
 				
+				# CLAVE: Solo revela el estado (1=barco, -1=agua) si aún no ha sido impactado
 				if estado_actual == -1 or estado_actual == 1:
 					grid_container.actualizar_celda_visual(target_x, target_y, estado_actual)
 
@@ -712,9 +761,11 @@ func _on_tablero_objetivo_clic(coord: Vector2):
 		
 	var es_impacto = false
 	var costo_disparo = 0
+	var disparo_seleccionado = tipo_disparo_actual # Capturamos el tipo antes de resetearlo
 	
-	# ... Lógica de selección de disparo ...
-	match tipo_disparo_actual:
+	# La lógica de selección de disparo se realiza al presionar el botón
+	# Aquí solo se valida y se ejecuta
+	match disparo_seleccionado:
 		"Mortero":
 			es_impacto = _ejecutar_disparo_mortero(coord)
 		"Cohete":
@@ -723,35 +774,42 @@ func _on_tablero_objetivo_clic(coord: Vector2):
 				es_impacto = _ejecutar_disparo_cohete(coord)
 				monedas_jugador -= costo_disparo
 			else:
-				tipo_disparo_actual = "Mortero"
-				return
+				print("ERROR: Monedas insuficientes para Cohete. Usando Mortero.")
+				disparo_seleccionado = "Mortero"
+				es_impacto = _ejecutar_disparo_mortero(coord)
 		"Sonar":
 			costo_disparo = COSTO_SONAR
 			if monedas_jugador >= costo_disparo:
-				_ejecutar_disparo_sonar(coord) 
+				_ejecutar_disparo_sonar(coord)
 				monedas_jugador -= costo_disparo
+				# El sonar nunca devuelve impacto (es solo revelación), forzamos el paso de turno
+				es_impacto = false 
 			else:
-				tipo_disparo_actual = "Mortero"
-				return
+				print("ERROR: Monedas insuficientes para Sonar. Usando Mortero.")
+				disparo_seleccionado = "Mortero"
+				es_impacto = _ejecutar_disparo_mortero(coord)
 		"Area":
 			costo_disparo = COSTO_AREA
 			if monedas_jugador >= costo_disparo:
 				es_impacto = _ejecutar_disparo_area(coord)
 				monedas_jugador -= costo_disparo
 			else:
-				tipo_disparo_actual = "Mortero"
-				return
+				print("ERROR: Monedas insuficientes para Área. Usando Mortero.")
+				disparo_seleccionado = "Mortero"
+				es_impacto = _ejecutar_disparo_mortero(coord)
 		"Ulti":
 			costo_disparo = 0
 			if ulti_disponible:
 				es_impacto = _ejecutar_disparo_ulti(coord)
 			else:
-				tipo_disparo_actual = "Mortero"
-				return
+				print("ERROR: Ulti no cargada. Usando Mortero.")
+				disparo_seleccionado = "Mortero"
+				es_impacto = _ejecutar_disparo_mortero(coord)
 		_:
 			es_impacto = _ejecutar_disparo_mortero(coord)
 	
-	tipo_disparo_actual = "Mortero"
+	tipo_disparo_actual = "Mortero" # Resetear siempre al Mortero después de usar
+	actualizar_textos_botones_disparo() # Actualiza el texto para quitar el "🎯"
 	actualizar_interfaz_monedas()
 	
 	ejecutar_disparo_jugador(coord, es_impacto)
@@ -830,7 +888,7 @@ func turno_ia():
 			print("IA: Modo CAZA sin objetivos, volviendo a BÚSQUEDA.")
 	
 	# CORRECCIÓN DE FLUJO: Solo continúa el turno si hubo impacto Y la fase sigue en BATALLA
-	if es_impacto and fase_actual == Fase.BATALLA: 
+	if es_impacto and fase_actual == Fase.BATALLA:
 		get_tree().create_timer(0.5).timeout.connect(turno_ia)
 	elif fase_actual == Fase.BATALLA:
 		print("Turno de la IA finalizado. Turno del Jugador.")
@@ -843,10 +901,10 @@ func _es_barco_hundido(tablero: Node2D, coord_impacto: Vector2) -> bool:
 	
 	for child in tablero.get_children():
 		# Buscamos nodos que sean barcos (asumiendo que los barcos tienen esta meta)
-		if child is Node2D and child.has_meta("longitud_casillas"): 
+		if child is Node2D and child.has_meta("longitud_casillas"):
 			var barco = child
 			# Aseguramos que la conversión a int sea correcta
-			var longitud = barco.get_meta("longitud_casillas") as int 
+			var longitud = barco.get_meta("longitud_casillas") as int
 			var es_horizontal_barco = (barco.rotation_degrees == 0)
 			
 			var barco_pos_local_grid = barco.position / CELL_SIZE
@@ -854,13 +912,11 @@ func _es_barco_hundido(tablero: Node2D, coord_impacto: Vector2) -> bool:
 			var start_y = int(round(barco_pos_local_grid.y))
 
 			# Ajuste de coordenadas iniciales para barcos verticales del jugador/IA
-			# Si el barco es vertical, la posición visual de Godot está compensada.
-			# Aquí, ajustamos 'start_y' para que corresponda a la celda superior (y real) de la matriz.
 			if not es_horizontal_barco:
-				# Si es vertical, la posición 'y' visual está un CELL_SIZE más arriba. 
+				# Si es vertical, la posición 'y' visual está un CELL_SIZE más arriba. 
 				# Ajustamos la posición inicial de la matriz para que coincida con la celda más baja (correcta).
 				if start_y < 10:
-					start_y += 1 
+					start_y += 1
 			
 			var barco_hit = false
 			# 1. Verificar si la coordenada impactada está dentro del área lógica de este barco
@@ -888,7 +944,7 @@ func _es_barco_hundido(tablero: Node2D, coord_impacto: Vector2) -> bool:
 				# 3. Determinar si está hundido
 				return impactos_en_este_barco == longitud
 				
-	return false 
+	return false
 
 
 # =========================================================
@@ -902,16 +958,18 @@ func _registrar_impacto_en_barco(tablero: Node2D, coord: Vector2, _es_enemigo: b
 func check_win_condition():
 	if barcos_ia_hundidos == TOTAL_BARCOS:
 		print("====================================")
-		print("         🎉 ¡FELICIDADES, HAS GANADO! 🎉")
+		print("         🎉 ¡FELICIDADES, HAS GANADO! 🎉")
 		print("====================================")
+		# Se muestra el texto de victoria en pantalla
 		resultado_label.text = "¡FELICIDADES, HAS GANADO! 🏆"
 		resultado_label.visible = true
 		fase_actual = Fase.FIN_JUEGO # CLAVE: Detiene la recursión de turnos
 		get_tree().paused = true # <--- CLAVE: Pausa todo el juego
 	elif barcos_jugador_hundidos == TOTAL_BARCOS:
 		print("====================================")
-		print("           ☠️ HAS PERDIDO ☠️")
+		print("           ☠️ HAS PERDIDO ☠️")
 		print("====================================")
+		# Se muestra el texto de derrota en pantalla
 		resultado_label.text = "☠️ HAS PERDIDO ☠️"
 		resultado_label.visible = true
 		fase_actual = Fase.FIN_JUEGO # CLAVE: Detiene la recursión de turnos

@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://c6ity8iodi8pf"]
 
-[ext_resource type="Texture2D" uid="uid://sa5acwjc52ks" path="res://png-transparent-wooden-frames-metal-flower-border-wooden-frames-frames-thumbnail (1).png" id="1_n4tde"]
+[ext_resource type="Texture2D" uid="uid://duldp55jp1o0b" path="res://images-removebg-preview (1).png" id="1_n4tde"]
 [ext_resource type="Script" uid="uid://cm7eaycfkut3y" path="res://celda.gd" id="1_r04n3"]
 
 [node name="TextureButton" type="TextureButton"]
